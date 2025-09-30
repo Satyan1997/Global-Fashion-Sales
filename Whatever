@@ -1,0 +1,118 @@
+# 🌐 Enterprise ETL Pipeline (SSIS) 🚀
+
+Welcome to the orchestration of robust data engineering! This project is a modular, production-ready SSIS ETL solution crafted to automate bulk data loading, enforce advanced error handling, deliver dynamic auditing, and empower granular business insights. 
+
+## Table of Contents
+
+- [Project Overview](#project-overview)  
+- [Architectural Flow](#architectural-flow)  
+- [Key Features](#key-features)  
+- [Module Breakdown](#module-breakdown)  
+- [Error Management](#error-management)  
+- [Installation & Usage](#installation--usage)  
+- [Data Sources & Destinations](#data-sources--destinations)  
+- [Customization](#customization)  
+- [Troubleshooting](#troubleshooting)  
+- [Credits](#credits)
+
+---
+
+## Project Overview
+
+This solution is designed for high-volume, enterprise-grade data integration. Leveraging SSIS, it extracts, transforms, and loads (ETL) diverse datasets from flat files into a data warehouse, supporting complex business logic, slow-changing dimensions, relational integrity, and automated notifications.
+
+---
+
+## 🏗️ Architectural Flow
+
+**Control Flow:**  
+- File existence validation  
+- Main Data Flow orchestration  
+- Automated logging and status update  
+- Success, failure, and notification email triggers  
+- Dynamic task sequencing via precedence constraints (AND/OR expressions)
+
+**Data Flow:**  
+- Flat file ingestion  
+- Data conversions, derived computations  
+- Conditional splits for record validation  
+- SCD: Handles dimension changes  
+- Auditing: Row counts, error logging  
+- Bulk and incremental inserts with OLE DB destinations
+
+**Diagrams illustrating task dependencies and error routing:**  
+![Data Flow Diagram 1](./images/dataflow1.jpg)  
+![Event Handler Flow](./images/eventhandlers.jpg)  
+![Precedence Constraint Editor](./images/precedenceconstraint.jpg)  
+![Lookup and Error Handling](./images/lookup_error_handling.jpg)  
+![Foreach Loop with Scripts](./images/foreach_loop.jpg)  
+![Control Flow with Logs and Notifications 1](./images/controlflow_logs1.jpg)  
+![Control Flow with Logs and Notifications 2](./images/controlflow_logs2.jpg)
+
+*(Replace the paths above with your repository relative paths where you store images.)*
+
+---
+
+## ⚡ Key Features
+
+- **Modular Control Flows:** Advanced containerization with Foreach loops and script tasks for dynamic file and entity processing  
+- **Dynamic Error Management:** Automated error capture, email alerting, log updates, and error file retention  
+- **Audit Trail:** Comprehensive row counts, success/failure tracing, and record-level error storage  
+- **Slow Changing Dimension:** Historical data preservation, member update tracking, and inference handling  
+- **Precedence Constraints:** Logical condition-based sequencing ("AND"/"OR") for adaptive execution  
+- **Easy Customization:** Parameter-driven configuration—quickly adapt load rules and validation logic
+
+---
+
+## 🚦 Module Breakdown
+
+| Module                | Purpose                                   | Components                                      |
+|-----------------------|-------------------------------------------|-------------------------------------------------|
+| Control Flow          | Master flow, validation, triggers         | Foreach Loop, Script Task, Email, File Ops       |
+| Data Flow Tasks       | Ingestion, transformation, validation     | Conversion, Derived Column, Split, SCD, Lookup   |
+| Event Handlers        | Reactive alerts/logging on error events   | Capture Error, Email Failure, Table Log, Move File|
+| Precedence Constraints| Logic-driven execution control            | AND/OR, Success/Failure, Expression logic        |
+
+---
+
+## 🛡️ Error Management
+
+Automatic error detection triggers an event handler pipeline:  
+1. Capture error descriptions  
+2. Send failure report emails  
+3. Update logging tables  
+4. Move failed files to error directories for audit and review
+
+---
+
+## ⚙️ Installation & Usage
+
+1. Clone repository into SSIS-enabled Visual Studio.  
+2. Update connection managers for your file and database sources.  
+3. Configure environment parameters (paths, SMTP/email addresses, task variables).  
+4. Run package or schedule via SQL Server Agent.
+
+Detailed setup guide to follow or create separately in `/docs/INSTALL.md`.
+
+---
+
+## 📂 Data Sources & Destinations
+
+- **Sources:** Flat files (CSV/TSV), Excel files, or API streams (customizable)  
+- **Destination:** SQL Server, PostgreSQL, or any OLE DB-compliant data warehouse  
+
+Mappings and transformations are configured within Data Flow and Lookup components.
+
+---
+
+## 🎨 Customization
+
+- Add/remove entities in Foreach containers  
+- Customize validation logic in Derived Column and Conditional Split tasks  
+- Extend error handling with additional notifications or file handling  
+
+---
+
+## 🔍 Troubleshooting
+
+- All error events are logged
