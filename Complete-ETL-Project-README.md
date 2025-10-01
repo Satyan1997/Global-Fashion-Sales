@@ -123,6 +123,8 @@ The Master Package operates through a **Foreach Loop Container** that iterates t
     ├── 🏪 Dim_Stores.dtsx
     └── 💰 Dim_Discounts.dtsx
     ↓
+🔄 Foreach Loop Initiation
+    ↓
 📈 Fact Packages Execution
     └── 🛍️ Fact_Sales.dtsx
     ↓
@@ -310,61 +312,211 @@ This **Enterprise Sales Data Warehouse ETL Project** demonstrates the power of w
 
 #### 1️⃣ **Database Setup**
 ```sql
--- Create warehouse database
-CREATE DATABASE SalesDataWarehouse;
-
--- Create staging database  
-CREATE DATABASE SalesStaging;
-
--- Create logging tables
-USE SalesDataWarehouse;
+USE [Global_Fashion_Retail]
 GO
 
-CREATE TABLE ETL_Log (
-    LogID INT IDENTITY(1,1) PRIMARY KEY,
-    PackageName NVARCHAR(100),
-    StartTime DATETIME2,
-    EndTime DATETIME2,
-    Status NVARCHAR(20),
-    RowsProcessed INT,
-    ErrorMessage NVARCHAR(MAX)
-);
+-- Create Customer Dimension
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Dim_Customer](
+[CustomerKey] int IDENTITY(1,1) NOT NULL,
+[CustomerID] int NOT NULL,
+[CustomerName] varchar(150) NOT NULL,
+[Email] varchar(150) NULL,
+[Telephone] varchar(50) NULL,
+[City] varchar(50) NULL,
+[Country] varchar(50) NULL,
+[Gender] varchar(50) NULL,
+[DateOfBirth] varchar(50) NULL,
+[JobTitle] varchar(100) NULL,
+[Address] varchar(200) NULL,
+[EffectiveDate] datetime NULL,
+[ExpiryDate] datetime NULL,
+[CurrentFlag] bit NOT NULL,
+PRIMARY KEY CLUSTERED ([CustomerKey] ASC)
+) ON [PRIMARY];
+GO
 
--- Create dimension tables
-CREATE TABLE DimCustomer (
-    CustomerKey INT IDENTITY(1,1) PRIMARY KEY,
-    CustomerID NVARCHAR(50),
-    CustomerName NVARCHAR(100),
-    EffectiveDate DATE,
-    ExpirationDate DATE,
-    CurrentFlag BIT
-);
+-- Create Discount Dimension
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Dim_Discount](
+[DiscountKey] int IDENTITY(1,1) NOT NULL,
+[StartDate] date NOT NULL,
+[EndDate] date NOT NULL,
+[DiscountRate] float NOT NULL,
+[Description] varchar(255) NOT NULL,
+[Category] varchar(100) NULL,
+[SubCategory] varchar(100) NULL,
+[CurrentFlag] int NOT NULL,
+[ExpiryDate] date NULL,
+PRIMARY KEY CLUSTERED ([DiscountKey] ASC)
+) ON [PRIMARY];
+GO
 
-CREATE TABLE DimProduct (
-    ProductKey INT IDENTITY(1,1) PRIMARY KEY,
-    ProductID NVARCHAR(50),
-    ProductName NVARCHAR(100),
-    Category NVARCHAR(50),
-    Price DECIMAL(10,2),
-    EffectiveDate DATE,
-    ExpirationDate DATE,
-    CurrentFlag BIT
-);
+-- Create Employee Dimension
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Dim_Employee](
+[EmployeeKey] int IDENTITY(1,1) NOT NULL,
+[EmployeeID] int NOT NULL,
+[StoreID] int NOT NULL,
+[EmployeeName] nvarchar(150) NULL,
+[Position] nvarchar(50) NULL,
+[EffectiveDate] date NOT NULL,
+[ExpiryDate] date NULL,
+[CurrentFlag] bit NOT NULL,
+PRIMARY KEY CLUSTERED ([EmployeeKey] ASC)
+) ON [PRIMARY];
+GO
 
--- Create fact table
-CREATE TABLE FactSales (
-    SalesKey INT IDENTITY(1,1) PRIMARY KEY,
-    TransactionID NVARCHAR(50),
-    CustomerKey INT,
-    ProductKey INT,
-    StoreKey INT,
-    EmployeeKey INT,
-    SaleDate DATE,
-    SaleAmount DECIMAL(10,2),
-    Quantity INT,
-    FOREIGN KEY (CustomerKey) REFERENCES DimCustomer(CustomerKey),
-    FOREIGN KEY (ProductKey) REFERENCES DimProduct(ProductKey)
-);
+-- Create Product Dimension
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Dim_Products](
+[ProductKey] int IDENTITY(1,1) NOT NULL,
+[ProductID] int NOT NULL,
+[Category] varchar(100) NULL,
+[SubCategory] varchar(100) NULL,
+[DescriptionEN] varchar(255) NULL,
+[Color] varchar(50) NULL,
+[Sizes] varchar(50) NULL,
+[ProductionCost] numeric(18,2) NULL,
+[Size1] nvarchar(10) NULL,
+[Size2] nvarchar(10) NULL,
+[Size3] nvarchar(10) NULL,
+[Size4] nvarchar(10) NULL,
+[Size5] nvarchar(10) NULL,
+[Size6] nvarchar(10) NULL,
+[EffectiveDate] datetime NULL,
+[ExpiryDate] date NULL,
+[CurrentFlag] int NULL,
+PRIMARY KEY CLUSTERED ([ProductKey] ASC),
+CONSTRAINT UQ_Dim_Products_ProductID UNIQUE NONCLUSTERED ([ProductID] ASC)
+) ON [PRIMARY];
+GO
+
+-- Create Store Dimension
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Dim_Store](
+[StoreKey] int IDENTITY(1,1) NOT NULL,
+[StoreID] int NOT NULL,
+[StoreName] varchar(100) NOT NULL,
+[Country] varchar(50) NOT NULL,
+[City] varchar(50) NOT NULL,
+[NumberOfEmployees] int NOT NULL,
+[ZIPCode] varchar(50) NULL,
+[Latitude] decimal(9,6) NOT NULL,
+[Longitude] decimal(9,6) NOT NULL,
+[EffectiveDate] datetime NULL,
+[ExpiryDate] datetime NULL,
+[CurrentFlag] bit NOT NULL,
+PRIMARY KEY CLUSTERED ([StoreKey] ASC)
+) ON [PRIMARY];
+GO
+
+-- Create Fact Transactions
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Fact_Transactions](
+[TransactionKey] int IDENTITY(1,1) NOT NULL,
+[InvoiceID] varchar(50) NOT NULL,
+[Line] int NOT NULL,
+[CustomerKey] int NOT NULL,
+[ProductKey] int NOT NULL,
+[StoreKey] int NOT NULL,
+[EmployeeKey] int NOT NULL,
+[DiscountKey] int NULL,
+[TransactionDate] datetime NOT NULL,
+[UnitPrice] decimal(18,2) NULL,
+[Quantity] int NULL,
+[Discount] float NULL,
+[LineTotal] decimal(18,2) NULL,
+[TransactionType] varchar(50) NULL,
+[PaymentMethod] varchar(50) NULL,
+PRIMARY KEY CLUSTERED ([TransactionKey] ASC)
+) ON [PRIMARY];
+GO
+
+-- Add Foreign Keys
+ALTER TABLE [dbo].[Fact_Transactions]
+ADD CONSTRAINT FK_FactTransactions_Customer FOREIGN KEY(CustomerKey)
+REFERENCES [dbo].Dim_Customer;
+ALTER TABLE [dbo].[Fact_Transactions]
+ADD CONSTRAINT FK_FactTransactions_Discount FOREIGN KEY(DiscountKey)
+REFERENCES [dbo].Dim_Discount;
+ALTER TABLE [dbo].[Fact_Transactions]
+ADD CONSTRAINT FK_FactTransactions_Products FOREIGN KEY(ProductKey)
+REFERENCES [dbo].Dim_Products;
+ALTER TABLE [dbo].[Fact_Transactions]
+ADD CONSTRAINT FK_FactTransactions_Store FOREIGN KEY(StoreKey)
+REFERENCES [dbo].Dim_Store;
+GO
+
+-- Create SSIS Audit Log
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[SSIS_AuditLog](
+[AuditID] int IDENTITY(1,1) NOT NULL,
+[PackageName] nvarchar(200) NOT NULL,
+[FileName] nvarchar(500) NULL,
+[FileType] nvarchar(100) NULL,
+[StartTime] datetime NOT NULL DEFAULT (GETDATE()),
+[EndTime] datetime NULL,
+[RowsRead] int NULL,
+[RowsInserted] int NULL,
+[RowsRejected] int NULL,
+[Status] nvarchar(20) NOT NULL,
+[ErrorMessage] nvarchar(2000) NULL,
+[CreatedOn] datetime NOT NULL DEFAULT (GETDATE()),
+[ProcessOwner] varchar(50) NULL,
+PRIMARY KEY CLUSTERED ([AuditID] ASC)
+) ON [PRIMARY];
+GO
+
+-- Create Staging Table
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Stg_Transactions](
+[InvoiceID] varchar(50) NOT NULL,
+[Line] int NOT NULL,
+[CustomerID] int NOT NULL,
+[ProductID] int NOT NULL,
+[StoreID] int NOT NULL,
+[EmployeeID] int NOT NULL,
+[DiscountID] int NULL,
+[TransactionDate] datetime NOT NULL,
+[UnitPrice] decimal(18,2) NULL,
+[Quantity] int NULL,
+[DiscountRate] float NULL,
+[LineTotal] decimal(18,2) NULL,
+[TransactionType] varchar(50) NULL,
+[PaymentMethod] varchar(50) NULL,
+[LoadDateTime] datetime NOT NULL DEFAULT (GETDATE()),
+[BatchID] int NULL,
+[FileName] nvarchar(500) NULL
+) ON [PRIMARY];
+GO
+CREATE NONCLUSTERED INDEX IX_Stg_Transactions_LoadDate
+ON [dbo].[Stg_Transactions](LoadDateTime DESC);
+GO
 ```
 
 #### 2️⃣ **SSIS Project Configuration**
@@ -448,6 +600,12 @@ FROM DimCustomer;
 ---
 
 ## 🔧 Making It Your Own
+
+- Adjust Derived Column logic to reflect business rules
+- Modify Conditional Split validations
+- Extend SCD attributes per dimension needs
+- Add new dimensions/facts: create package → add to Master sequence → test → deploy
+- Enhance notifications (recipients/templates) and add Teams/Slack webhooks if desired
 
 ### 🎨 Customization Guide
 
