@@ -99,7 +99,7 @@ The **Master Package** serves as the conductor of our ETL orchestra, coordinatin
 
 The Master Package operates through a **Foreach Loop Container** that iterates through multiple data files and executes dimension and fact packages dynamically:
 
-![Master Package Control Flow](./images/master-control-flow.png)
+<img width="640" height="320" alt="image" src="https://github.com/user-attachments/assets/78b815db-20fa-47ad-82ec-b1e28dcf2262" />
 
 | 🔧 **Container/Task** | 📖 **Description** | 🎯 **Purpose** |
 |----------------------|-------------------|----------------|
@@ -139,7 +139,9 @@ Dimension packages handle the **foundation data** of our warehouse - managing di
 
 ### 🕹️ Dimension Control Flow
 
-![Dimension Package Control Flow](./images/dimension-control-flow.png)
+<img width="480" height="420" alt="Dimension Package _ Mermaid Chart-2025-09-29-225543" src="https://github.com/user-attachments/assets/d97dfe53-52f0-423b-ad96-823184611156" />
+<img width="480" height="532" alt="image" src="https://github.com/user-attachments/assets/2ce82515-ac02-4239-add0-efd06717523a" />
+
 
 | 🔧 **Task** | 📖 **Description** | 🎯 **Purpose** |
 |-------------|-------------------|----------------|
@@ -154,7 +156,8 @@ Dimension packages handle the **foundation data** of our warehouse - managing di
 
 ### 🗃️ Dimension Data Flow
 
-![Dimension Package Data Flow](./images/dimension-data-flow.png)
+<img width="340" height="620" alt="Dimension Package data flow" src="https://github.com/user-attachments/assets/7322e8fb-1a28-4b68-a568-d0f549791833" />
+<img width="420" height="620" alt="image" src="https://github.com/user-attachments/assets/92aec164-2bd4-4de5-878c-d4691bafbf17" />
 
 | 🔄 **Component** | 📘 **Technical Function** | 💼 **Business Purpose** |
 |------------------|---------------------------|------------------------|
@@ -188,27 +191,14 @@ The Slowly Changing Dimension component implements the following logic:
     └─✅ Unchanged Record → No action required
 ```
 
-### 🛡️ Dimension Error Handling
-
-Both dimension and fact packages share the same error handling pattern:
-
-![Dimension Error Handler](./images/dimension-error-handler.png)
-
-| 🚨 **Error Task** | 📚 **Description** |
-|-------------------|-------------------|
-| 📝 **CaptureErrorDescription** | Extracts comprehensive error details for troubleshooting |
-| 📤 **SendFailureEmail** | Sends immediate failure notification to support team |
-| 📈 **UpdateLogTable** | Updates log table with error status and details |
-
----
-
 ## 📈 Fact Package Flow
 
 The **Fact Package** processes the core business metrics - the quantifiable, additive measures that drive business decisions.
 
 ### 🕹️ Fact Control Flow
 
-![Fact Package Control Flow](./images/fact-control-flow.png)
+<img width="360" height="420" alt="Fact Package _ Mermaid Chart-2025-09-29-230419" src="https://github.com/user-attachments/assets/00927c0a-df2b-4a4a-8de5-819ca874e6b3" />
+<img width="420" height="532" alt="image" src="https://github.com/user-attachments/assets/af5b918d-ad0d-44de-a35c-ef6358c52cb8" />
 
 | 🔧 **Task** | 📖 **Description** | 🎯 **Business Impact** |
 |-------------|-------------------|----------------------|
@@ -223,7 +213,9 @@ The **Fact Package** processes the core business metrics - the quantifiable, add
 
 ### 🗃️ Fact Data Flow Deep Dive
 
-![Fact Package Data Flow](./images/fact-data-flow.png)
+<img width="240" heigh="420" alt="Fact Package Data flow" src="https://github.com/user-attachments/assets/1f432c35-579e-442c-923b-81429f73a019" />
+<img width="480" height="533" alt="image" src="https://github.com/user-attachments/assets/63164400-f5ba-4354-b7e2-f27616226b23" />
+
 
 | 🔄 **Component** | 📘 **Technical Function** | 💼 **Business Purpose** |
 |------------------|---------------------------|------------------------|
@@ -242,19 +234,19 @@ The **Fact Package** processes the core business metrics - the quantifiable, add
 | 🔄 **Data Conversion 1** | Converts errored records for error table schema | Prepares failed records for analysis |
 | 🛠️ **OLE DB Destination 1** | Stores errored records in dedicated error table | Provides visibility into data quality issues |
 
-### 🛡️ Fact Package Error Handling
+### 🛡️ Package Error Handling
 
-The fact package implements a **two-tier error handling approach**:
+The dimension & fact package implements a **two-tier error handling approach**:
 
 #### 🔴 **Pre-Load Error Handling** (File Check Failures)
-![Pre-Load Error Handler](./images/fact-error-preload.png)
+<img width="480" height="336" alt="image" src="https://github.com/user-attachments/assets/d342b348-8683-4cfa-984b-d02c2bad9e44" />
 
 When errors occur **before** the Data Flow Task (like missing files):
 - **CaptureErrorDescription** → **SendFailureEmail** → **UpdateLogTable**
 - File-related issues are handled without data processing
 
 #### 🟡 **Post-Load Error Handling** (After Successful Data Load)
-![Post-Load Error Handler](./images/fact-error-postload.png)
+<img width="480" height="270" alt="image" src="https://github.com/user-attachments/assets/cb667b77-959d-4009-ab42-4d3f323f1798" />
 
 When errors occur **after** successful data loading (archival/logging issues):
 - **CaptureErrorDescription** → **SendFailureEmail** → **UpdateLogTable** → **MoveFileToError**
