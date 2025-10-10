@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:ObjectName="stores.csv"
+  DTS:DTSID="{6B8BB00D-ADA2-459F-A35C-06E241DC4357}"
+  DTS:CreationName="FILE">
+  <DTS:ObjectData>
+    <DTS:ConnectionManager
+      DTS:ConnectionString="C:\Users\13167\Documents\SSIS\Global Fashion Retail\stores.csv" />
+  </DTS:ObjectData>
+</DTS:ConnectionManager>
