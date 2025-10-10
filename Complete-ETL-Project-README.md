@@ -264,6 +264,64 @@ When errors occur **after** successful data loading (archival/logging issues):
 📊 Audit & Reconciliation
 ```
 
+### 🧩 Project Parameters
+
+<img width="480" height="361" alt="image" src="https://github.com/user-attachments/assets/4b8c4071-f16a-4fdf-8660-09cae68efb05" />
+
+| **Name** | **Data Type** | **Value** | **Sensitive** | **Required** | **Description** |
+|-----------|----------------|------------|----------------|----------------|----------------|
+| ArchiveDirectory | String | `C:\Users\13167\Documents\SSIS\Global_Fashion_Archive` | False | False | Directory path to store archived files |
+| AuditDBConnection | String | `[dbo].[SSIS_AuditLog]` | False | False | Database table name for SSIS audit logging |
+| AuditTableName | String | `[dbo].[SSIS_AuditLog]` | False | False | Table used to record package audit information |
+| Environment | String | `Dev` | False | False | Specifies deployment environment (Dev/QA/Prod) |
+| ErrorDirectory | String | `C:\Users\13167\Documents\SSIS\Global_Fashion_Error` | False | False | Directory path to store error files |
+| FileCategory | String | `*.csv;*.xlsx` | False | False | Defines allowed file formats for processing |
+| FilePattern | String | `*.csv;*.xlsx` | False | False | File pattern to match during data import |
+| FromEmail | String | `sathi.chowdary.sr@gmail.com` | False | False | Sender email address used for SSIS alerts |
+| ProcessOwner | String | `SatyaNarayana` | False | False | Owner or responsible person for package operations |
+| SmtpPassword | String | `add your password here` | False | False | SMTP password for Gmail (App Password recommended) |
+| SmtpPort | Int32 | `587` | False | False | SMTP port number |
+| SmtpServer | String | `smtp.gmail.com` | False | False | SMTP server used for email notifications |
+| SmtpUsername | String | `example@gmail.com` | False | False | SMTP username for authentication |
+| SourceFolderPath | String | `C:\Users\13167\Documents\SSIS\Global Fashion Retail` | False | False | Directory where source files are placed |
+| ToEmail | String | `example@gmail.com; example@gmail.com` | False | False | Recipients for SSIS notification emails |
+
+---
+
+### 🎯 Package Variables
+
+<img width="480" height="360" alt="image" src="https://github.com/user-attachments/assets/baddd476-6900-4539-8f66-c4bb9dd58377" />
+
+| **Name** | **Scope** | **Data Type** | **Value / Expression** | **Description** |
+|-----------|------------|---------------|--------------------------|----------------|
+| AuditID | Dim_Employee | Int32 | `0` | Stores audit log record ID |
+| EmailBodyFailure | Dim_Employee | String | `"Hello Team, The SSIS package failed..."` | Email body content for failure notification |
+| EmailBodyFileNotFound | Dim_Employee | String | `"Hello Team, The SSIS package did not find the input file..."` | Email body when file missing |
+| EmailBodySuccess | Dim_Employee | String | `"Hello Team, The SSIS package executed successfully."` | Email body content for success notification |
+| EmailSubjectFailure | Dim_Employee | String | `[SSIS Failure] Package: Dim_Employee` | Email subject line for failure |
+| EmailSubjectFileNotFound | Dim_Employee | String | `[SSIS Alert] Package: Dim_Employee` | Email subject line for missing file alert |
+| EmailSubjectSuccess | Dim_Employee | String | `[SSIS Success] Package: Dim_Employee` | Email subject line for successful execution |
+| EndDateTime | Dim_Employee | DateTime | `GETDATE()` | Captures package end time |
+| ErrorMessage | Dim_Employee | String |  | Stores any error message text |
+| FileExistsFlag | Dim_Employee | Int32 | `0` | Indicates if input file exists (1 = True, 0 = False) |
+| FileName | Dim_Employee | String |  | Stores name of file currently being processed |
+| LoadDate | Dim_Employee | DateTime | `GETDATE()` | Tracks when data was loaded |
+| PackageExecutionStatus | Dim_Employee | String |  | Indicates overall package execution status |
+| RecordsErrored | Dim_Employee | Int32 | `0` | Number of rows failed during processing |
+| RecordsLoaded | Dim_Employee | Int32 | `0` | Number of records successfully loaded |
+| RowsRead | Dim_Employee | Int32 | `0` | Total number of rows read from source |
+| StartDateTime | Dim_Employee | DateTime | `GETDATE()` | Captures package start time |
+
+---
+
+## ⚙️ Notes
+
+- All email-related parameters use **Gmail SMTP (Port 587)** for notification.
+- **App passwords** are used instead of standard Gmail passwords for security.
+- Environment (`Dev`, `QA`, `Prod`) controls logging and directory path switching.
+- The `AuditTableName` parameter connects with SQL Server table `[dbo].[SSIS_AuditLog]` for execution metadata.
+- Package variables are dynamically assigned using **SSIS Expressions** for start/end timestamps.
+
 ---
 
 ## 🎯 Project Conclusion
